@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CustomerRequest;
 use App\Models\Mitra;
+use App\Models\Role;
 use App\Models\RoleUser;
 use App\Models\User;
 use Carbon\Carbon;
@@ -62,6 +63,15 @@ class UserController extends Controller
             $return['isRefresh'] = true;
         } else if ($user->email != $request->email) {
             $return['isRefresh'] = true;
+        }
+
+        $roles = Role::where('name', strtolower($request->role))->first();
+        if ($roles == null) {
+            return response()->json([
+                'data'	=> [],
+                'errors' => ['Role hanya bisa diisi dengan Customer / Super admin'],
+                'status'    => false
+            ], 500);
         }
 
         DB::beginTransaction();
