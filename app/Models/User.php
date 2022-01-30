@@ -63,10 +63,14 @@ class User extends Authenticatable
         $user = auth()->user();
         if ($user) {
             $roles = RoleUser::where('users_id', $user->id)->first();
-            if ($roles->role_id == 1) {
-                return true;
-            } else {
+            if ($roles == null) {
                 return false;
+            } else {
+                if ($roles->role_id == 1) {
+                    return true;
+                } else {
+                    return false;
+                }
             }
         }
     }

@@ -113,17 +113,19 @@ class UserController extends Controller
         $data = [];
         $isSelf = false;
 
+        $currentUser = User::with(['userRoles'])->find($id);
+        $currentRole = $currentUser->userRoles[0]['pivot']['role_id'];
+
         DB::beginTransaction();
         try {
-            $delete = User::where('id', $id)->delete();
             Mitra::where('user_id', $id)->delete();
-            RoleUser::where('users_id', $id)->delete();
-            if ($delete) {
-                if ($user->id == $id) {
-                    $isSelf = true;
-                }
-                $data = User::with(['mitra', 'userRoles'])->get();
+            $currentUser->userRoles()->detach([$currentRole]);
+            $delete = User::where('id', $id)->delete();
+
+            if ($user->id == $id) {
+                $isSelf = true;
             }
+            $data = User::with(['mitra', 'userRoles'])->get();
 
             DB::commit();
             return response()->json([
@@ -139,7 +141,7 @@ class UserController extends Controller
                 'message'   => $th->getMessage(),
                 'status'    => false,
                 'isSelf'    => false
-            ]);
+            ], 500);
         }
     }
 }

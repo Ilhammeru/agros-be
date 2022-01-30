@@ -30,5 +30,5 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('general', [UserController::class, 'general']);
     Route::patch('update', [UserController::class, 'update']);
     Route::get('mitra', [UserController::class, 'index']);
-    Route::post('delete', [UserController::class, 'delete']);
 });
+Route::post('delete', [UserController::class, 'delete'])->middleware(['auth:api', 'scope:super-admin']);
